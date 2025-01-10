@@ -1,0 +1,266 @@
+-- 1. Create the database schema
+create database schema;
+
+-- Create Departments table
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100)
+);
+
+
+-- Create Students table
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    date_of_birth DATE,
+    enrollment_date DATE,
+    department_id INT
+FOREGIN  KEY (department_id) REFERENCES Department (department_id));
+ 
+);
+
+
+
+-- Create Professors table
+CREATE TABLE Professors (
+    professor_id INT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(20)
+);
+
+
+-- Create Courses table
+CREATE TABLE Courses (course_id int PRIMARY KEY,
+course_name varchar(100),
+department_id int,
+professore_id int,
+credits int,
+FOREIGN KEY (department_id) REFERENCES Department (department_id),
+FOREIGN KEY (professore_id) REFERENCES Professores (professore_id));
+
+
+
+
+-- Create Enrollments table
+CREATE TABLE Enrollments
+(enrollment_id int PRIMARY KEY,
+ student_id int,
+ course_id int,
+ enrollment_date date,
+ grade varchar(5),
+ FOREIGN KEY (student_id) REFERENCES Studetns (student_id),
+ FOREIGN KEY (course_id) REFERENCES Courses (course_id));
+                                            
+
+-- 2. Insert sample data
+
+-- Insert data into Departments table
+INSERT INTO Departments (department_id, department_name) VALUES
+(1, 'Computer Science'),
+(2, 'Mathematics'),
+(3, 'Physics');
+
+
+-- Insert data into Professors table
+INSERT INTO Professors (professor_id, first_name, last_name, email, phone)
+VALUES 
+(1, 'Alice', 'Johnson', 'alice.johnson@example.com', '123-456-7890'),
+(2, 'Bob', 'Smith', 'bob.smith@example.com', '123-456-7891'),
+(3, 'Carol', 'Williams', 'carol.williams@example.com', '123-456-7892'),
+(4, 'David', 'Jones', 'david.jones@example.com', '123-456-7893'),
+(5, 'Eve', 'Brown', 'eve.brown@example.com', '123-456-7894'),
+(6, 'Frank', 'Taylor', 'frank.taylor@example.com', '123-456-7895'),
+(7, 'Grace', 'Davis', 'grace.davis@example.com', '123-456-7896'),
+(8, 'Hank', 'Miller', 'hank.miller@example.com', '123-456-7897'),
+(9, 'Ivy', 'Wilson', 'ivy.wilson@example.com', '123-456-7898'),
+(10, 'Jack', 'Moore', 'jack.moore@example.com', '123-456-7899');
+
+
+
+-- Insert data into Students table
+INSERT INTO Students (student_id, first_name, last_name, email, phone, date_of_birth, enrollment_date, department_id) VALUES
+(1, 'Alice', 'Brown', 'alice.brown@university.edu', '111-222-3333', '2000-05-12', '2022-08-15', 1),
+(2, 'Bob', 'White', 'bob.white@university.edu', '222-333-4444', '1999-04-10', '2021-08-15', 2),
+(3, 'Charlie', 'Green', 'charlie.green@university.edu', '333-444-5555', '2001-07-22', '2022-08-15', 3),
+(4, 'Diana', 'Black', 'diana.black@university.edu', '444-555-6666', '2002-03-17', '2023-01-10', 1),
+(5, 'Ethan', 'Brown', 'ethan.brown@university.edu', '555-666-7777', '2000-12-24', '2020-08-15', 2),
+(6, 'Fiona', 'White', 'fiona.white@university.edu', '666-777-8888', '2001-02-19', '2021-08-15', 3),
+(7, 'George', 'Green', 'george.green@university.edu', '777-888-9999', '2002-06-15', '2022-08-15', 1),
+(8, 'Hannah', 'Black', 'hannah.black@university.edu', '888-999-0000', '2003-01-10', '2023-01-10', 2),
+(9, 'Ian', 'Brown', 'ian.brown@university.edu', '999-000-1111', '2000-08-22', '2020-08-15', 3),
+(10, 'Jack', 'White', 'jack.white@university.edu', '000-111-2222', '1999-11-11', '2019-08-15', 1);
+
+-- Insert data into Courses table
+INSERT INTO Courses (course_id, course_name, department_id, professor_id, credits) VALUES
+(1, 'Database Systems', 1, 1, 4),
+(2, 'Linear Algebra', 2, 2, 3),
+(3, 'Quantum Mechanics', 3, 2, 3),
+(4, 'Operating Systems', 1, 1, 4),
+(5, 'Calculus', 2, 2, 3),
+(6, 'Algorithms', 1, 1, 4),
+(7, 'Statistics', 2, 2, 3),
+(8, 'Thermodynamics', 3, 2, 3),
+(9, 'Machine Learning', 1, 1, 4),
+(10, 'Abstract Algebra', 2, 2, 3);
+
+-- Insert data into Enrollments table
+INSERT INTO Enrollments (enrollment_id, student_id, course_id, enrollment_date, grade) VALUES
+(1, 1, 1, '2023-01-15', 'A'),
+(2, 2, 2, '2022-09-10', 'B'),
+(3, 3, 3, '2023-01-20', 'A'),
+(4, 1, 4, '2023-01-15', 'B'),
+(5, 4, 1, '2023-01-20', 'C'),
+(6, 5, 2, '2021-09-10', 'B'),
+(7, 6, 5, '2022-08-15', 'A'),
+(8, 7, 6, '2022-08-15', 'A'),
+(9, 8, 7, '2023-01-10', 'B'),
+(10, 9, 8, '2020-08-15', 'A');
+
+-- 3. Queries
+
+-- Query 1: Find the total number of students in each department
+SELECT 
+    d.department_name AS Department,
+    COUNT(s.student_id) AS Total_Students
+FROM 
+    Departments d
+LEFT JOIN 
+    Students s
+ON 
+    d.department_id = s.department_id
+GROUP BY 
+    d.department_name;
+
+
+Output: 
+Department      Total_Students
+Computer Science     4
+Mathematics          3
+Physics              3
+
+
+
+-- Query 2: List all courses taught by a specific professor (e.g., John Doe)
+SELECT 
+    c.course_name AS Course
+FROM 
+    Courses c
+JOIN 
+    Professors p
+ON 
+    c.professor_id = p.professor_id
+   
+WHERE 
+    p.first_name = 'Bob' AND p.last_name = 'Smith';
+
+Output:
+
+Course
+Linear Algebra
+Quantum Mechanics
+Calculus
+Statistics
+Thermodynamics
+Abstract Algebra
+
+
+
+-- Query 3: . Find the Average Grade of Students in Each Course
+SELECT c.course_name AVG
+ ( CASE WHEN e.grade = 'A' THEN 4
+  WHEN e.grade = 'B' THEN 3
+  WHEN e.grade = 'C' THEN 2
+  ELSE 0 END) AS average_grades
+  FROM enrollments as e
+  JOIN courses as c ON e.course_id = c.course_id
+  GROUP BY c.course_name;
+                          
+-- Query 4: list all studetns who have not enrolled in any course .
+select s.first_name , s.last_name
+from students as s
+ left join enrollments e
+on s.student_id = e.student_id
+where e.enrollment_id is null;
+
+Output :
+firs_name    last_name
+Jack          White
+
+
+-- Query 5: find the number of course offered by each department.
+SELECT d.department_name, COUNT(c.course_id) AS total_courses
+FROM Departments d
+LEFT JOIN Courses c ON d.department_id = c.department_id
+GROUP BY d.department_name;
+
+Output:
+department_name      total_courses
+Computer Science          4
+Mathematics               4
+Physics                   2
+
+
+--Query 6: list all students who have taken a specific course (e.g. 'Database System').
+select s.first_name , s.last_name 
+from studetns s
+join enrollments e on s.student_id=e.student_id
+join courses c on e.course_id = c.course_id
+where c.course_name = "Database Systems";
+
+Output:
+first_name   last_name
+Alice        Brown
+Diana        Black
+
+
+--Query 7: fiind the mosst popular course based on enrollment numbers.
+select course_name , count(e.enrollment_id) as enrollment_count
+from courses c
+join enrollments e on c.course_id = e.course_id
+group by course_name
+order by enrollment_count desc
+limit 1;
+
+Output:
+course_name    enrollment_count
+Linear Algebra     2
+
+--Query 8: find the average number of credits per student in a department.
+select d.department_name, avg(c.credits) as avg_count
+from departments d
+join students s on d.department_id = s.department_id
+join enrollment e on s.student_id = e.student_id
+join courses  c on e.course_id = c.course_id
+group by department_name;
+
+Output:
+
+department_name     avg_count
+Computer Science     4.0000
+Mathematics          3.0000
+Physics              3.0000
+
+--Query 9: list all professors who teach in more then one department.
+select p.first_name , p.last_name from professors p
+join courses c on p.professor_id = c.professor_id
+group by p.first_name, p.last_name
+having count(distinct c.department_id) > 1;
+
+Output:
+first_name   last_name
+Bob          Smith
+
+--Query 10: get the highest and lowest grade in a specific course (e.g. 'operating system').
+select max(e.grade) as heighest_grades, min(e.grade) as lowest_grades
+from enrollments e
+join courses c on c.course_id = e.course_id 
+where c.course_name = 'Operating Systems';
+
+Output:
+heighest_grades   lowest_grades
+B                   B
