@@ -1,0 +1,177 @@
+--create database schema;
+
+-- Create Departments Table
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+);
+
+
+INSERT INTO Departments VALUES
+(1, 'Cardiology'),
+(2, 'Dermatology'),
+(3, 'Orthopedics'),
+(4, 'Pediatrics');
+
+
+-- Create Specialties Table
+CREATE TABLE Specialties (
+    specialty_id INT PRIMARY KEY,
+    specialty_name VARCHAR(100) NOT NULL
+);
+
+INSERT INTO Specialties VALUES
+(1, 'Cardiology'),
+(2, 'Dermatology'),
+(3, 'Orthopedics'),
+(4, 'Pediatrics');
+
+
+-- Create Doctors Table
+CREATE TABLE Doctors (
+    doctor_id INT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    department_id INT,
+    specialty_id INT,
+    joining_date DATE NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id),
+    FOREIGN KEY (specialty_id) REFERENCES Specialties(specialty_id)
+);
+
+INSERT INTO Doctors VALUES
+(1, 'John', 'Smith', 'john.smith@example.com', '1234567890', 1, 1, '2020-01-15'),
+(2, 'Emily', 'Brown', 'emily.brown@example.com', '9876543210', 2, 2, '2019-06-10'),
+(3, 'William', 'Johnson', 'william.johnson@example.com', '1239874560', 3, 3, '2021-03-20'),
+(4, 'Sarah', 'Davis', 'sarah.davis@example.com', '9871236540', 4, 4, '2022-08-05');
+
+-- Create Patients Table
+CREATE TABLE Patients (
+    patient_id INT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    gender VARCHAR(10) NOT NULL,
+    address TEXT NOT NULL
+);
+
+INSERT INTO Patients VALUES
+(1, 'Alice', 'Johnson', 'alice.johnson@example.com', '5551234567', '1980-05-12', 'Female', '123 Main St'),
+(2, 'Bob', 'Williams', 'bob.williams@example.com', '5559876543', '1975-08-24', 'Male', '456 Elm St'),
+(3, 'Catherine', 'Miller', 'catherine.miller@example.com', '5556543210', '1992-11-15', 'Female', '789 Pine St'),
+(4, 'Daniel', 'Brown', 'daniel.brown@example.com', '5553216547', '1985-06-30', 'Male', '101 Oak St');
+
+
+-- Create Appointments Table
+CREATE TABLE Appointments (
+    appointment_id INT PRIMARY KEY,
+    doctor_id INT,
+    patient_id INT,
+    appointment_date DATETIME NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id),
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id)
+);
+
+INSERT INTO Appointments VALUES
+(1, 1, 1, '2025-01-10 10:00:00', 'Regular Checkup', 'Scheduled'),
+(2, 1, 2, '2025-01-11 15:30:00', 'Follow-up', 'Completed'),
+(3, 2, 3, '2025-01-12 11:00:00', 'Skin Rash', 'Cancelled'),
+(4, 3, 4, '2025-01-13 09:00:00', 'Back Pain', 'Scheduled');
+
+
+-- Create Payments Table
+CREATE TABLE Payments (
+    payment_id INT PRIMARY KEY,
+    appointment_id INT,
+    payment_date DATE NOT NULL,
+    payment_amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(20) NOT NULL,
+    FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id)
+);
+
+INSERT INTO Payments VALUES
+(1, 2, '2025-01-11', 150.00, 'Credit Card'),
+(2, 4, '2025-01-13', 200.00, 'Cash');
+
+1. Find the Total Number of Appointments for Each Doctor.
+SELECT d.first_name, d.last_name, COUNT(a.appointment_id) AS total_appointments
+FROM Doctors d
+LEFT JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY d.doctor_id, d.first_name, d.last_name;
+
+2. List All Patients Who Have an Appointment with a Specific Doctor.
+SELECT p.first_name, p.last_name
+FROM Patients p
+JOIN Appointments a ON p.patient_id = a.patient_id
+JOIN Doctors d ON a.doctor_id = d.doctor_id
+WHERE d.first_name = 'John' AND d.last_name = 'Smith';
+
+
+3. Find the Number of Appointments Scheduled in a Specific Department
+SELECT dep.department_name, COUNT(a.appointment_id) AS total_appointments
+FROM Departments dep
+JOIN Doctors d ON dep.department_id = d.department_id
+JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY dep.department_id, dep.department_name;
+
+4. Find the Most Popular Specialty Based on Number of Appointments
+SELECT sp.specialty_name, COUNT(a.appointment_id) AS total_appointments
+FROM Specialties sp
+JOIN Doctors d ON sp.specialty_id = d.specialty_id
+JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY sp.specialty_id, sp.specialty_name
+ORDER BY total_appointments DESC
+LIMIT 1;
+
+5. Get the Total Payment Amount for All Completed Appointments
+SELECT SUM(p.payment_amount) AS total_completed_payments
+FROM Payments p
+JOIN Appointments a ON p.appointment_id = a.appointment_id
+WHERE a.status = 'Completed';
+
+6. Find the Number of Patients Seen by Each Doctor
+SELECT d.first_name, d.last_name, COUNT(DISTINCT a.patient_id) AS total_patients
+FROM Doctors d
+JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY d.doctor_id, d.first_name, d.last_name;
+
+7. List All Patients Who Have Missed Their Appointments
+SELECT p.first_name, p.last_name
+FROM Patients p
+JOIN Appointments a ON p.patient_id = a.patient_id
+WHERE a.status = 'Cancelled';
+
+8. Find the Total Number of Appointments for Each Status
+SELECT a.status, COUNT(a.appointment_id) AS total_appointments
+FROM Appointments a
+GROUP BY a.status;
+
+9. Get the Average Payment Amount for Completed Appointments
+SELECT AVG(p.payment_amount) AS average_payment
+FROM Payments p
+JOIN Appointments a ON p.appointment_id = a.appointment_id
+WHERE a.status = 'Completed';
+
+10. Find the Doctor with the Highest Number of Appointments
+SELECT d.first_name, d.last_name, COUNT(a.appointment_id) AS total_appointments
+FROM Doctors d
+JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY d.doctor_id, d.first_name, d.last_name
+ORDER BY total_appointments DESC
+LIMIT 1;
+
+
+
+
+
+
+
+
+
+
