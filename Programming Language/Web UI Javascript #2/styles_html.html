@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic News Feed</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Article Form -->
+        <form id="article-form">
+            <input type="text" id="title" placeholder="Enter Title" required />
+            <textarea id="description" placeholder="Enter Description" required></textarea>
+            <input type="text" id="image-url" placeholder="Enter Image URL (Optional)" />
+            <button type="submit">Add Article</button>
+        </form>
+
+        <!-- News Feed Section -->
+        <div id="news-feed">
+            <h2>News Feed</h2>
+            <div id="articles-container" class="grid"></div>
+        </div>
+
+        <!-- Pagination Section -->
+        <div id="pagination">
+            <button id="prev-btn">Previous</button>
+            <span id="page-numbers"></span>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let articles = []; // Articles ko store karne ke liye
+        let currentPage = 1; // Current page ka number
+        const articlesPerPage = 4; // Ek page par kitne articles dikhane hain
+        
+        const form = document.getElementById('article-form');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Default form submission ko roko
+        
+            // Input fields se data lena
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const imageUrl = document.getElementById('image-url').value.trim();
+        
+            if (title !== '' && description !== '') {
+                // Naya article array me add karna
+                const article = { title: title, description: description, imageUrl: imageUrl };
+                articles[articles.length] = article; // Manually array me add karna
+                form.reset(); // Form clear karna
+                renderArticles(); // Articles ko prapt karna
+            }
+        });
+        
+        
+        function renderArticles() {
+          const articlesContainer = document.getElementById('articles-container');
+          articlesContainer.innerHTML = ''; // Purana content clear karna
+        
+          // Start aur end index calculate karna
+          const startIndex = (currentPage - 1) * articlesPerPage;
+          const endIndex = startIndex + articlesPerPage;
+        
+          // Manual loop lagakar articles display karna
+          for (let i = startIndex; i < endIndex && i < articles.length; i++) {
+              const article = articles[i]; // Current article
+              const articleDiv = document.createElement('div');
+              articleDiv.className = 'article';
+              articleDiv.innerHTML = `
+                  <h3>${article.title}</h3>
+                  <p>${article.description}</p>
+                  ${article.imageUrl ? `<img src="${article.imageUrl}" alt="${article.title}">` : ''}
+              `;
+              articlesContainer.appendChild(articleDiv); // Article add karna
+          }
+        
+          renderPagination(); // Pagination update karna
+        }
+        
+        
+        function renderPagination() {
+            const totalPages = Math.ceil(articles.length / articlesPerPage); // Total pages
+            const paginationContainer = document.getElementById('page-numbers');
+            paginationContainer.innerHTML = ''; // Purana content clear
+        
+            // Page numbers create karna
+            for (let i = 1; i <= totalPages; i++) {
+                const pageSpan = document.createElement('span');
+                pageSpan.textContent = i;
+                pageSpan.style.margin = '0 5px';
+                pageSpan.style.cursor = 'pointer';
+                pageSpan.style.fontWeight = currentPage === i ? 'bold' : 'normal';
+                pageSpan.addEventListener('click', function () {
+                    currentPage = i; // Page change karna
+                    renderArticles(); // Articles render karna
+                });
+                paginationContainer.appendChild(pageSpan);
+            }
+        
+            // Previous aur Next buttons enable/disable
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages;
+        }
+        
+        </script>
+</body>
+</html>

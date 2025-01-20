@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      width: 300px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .todo-input {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #taskInput {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      background: #f1f1f1;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .edit-btn, .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Todo List App</h1>
+    <div class="todo-input">
+      <input type="text" id="taskInput" placeholder="Enter a new task">
+      <button id="addTaskBtn">Add Task</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    // Elements
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+
+    // Tasks Array
+    let tasks = [];
+
+    // Display tasks in the list
+    function displayTasks() {
+      taskList.innerHTML = ''; // पहले की लिस्ट को साफ करें
+
+      for (let i = 0; i < tasks.length; i++) {
+        const taskItem = document.createElement('li');
+        taskItem.textContent = tasks[i];
+
+        // Edit Button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.className = 'edit-btn';
+        editBtn.onclick = function () {
+          editTask(i);
+        };
+
+        // Delete Button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.onclick = function () {
+          deleteTask(i);
+        };
+
+        taskItem.appendChild(editBtn);
+        taskItem.appendChild(deleteBtn);
+        taskList.appendChild(taskItem);
+      }
+    }
+
+    // Add a new task
+    function addTask() {
+      const newTask = taskInput.value.trim();
+
+      if (newTask === '') {
+        alert('Please enter a task!');
+        return;
+      }
+
+      tasks.push(newTask); // Array में नई टास्क जोड़ें
+      taskInput.value = ''; // इनपुट फील्ड साफ करें
+      displayTasks(); // नई लिस्ट दिखाएं
+    }
+
+    // Edit an existing task
+    function editTask(index) {
+      const updatedTask = prompt('Edit your task:', tasks[index]);
+      if (updatedTask !== null) {
+        tasks[index] = updatedTask.trim(); // टास्क को अपडेट करें
+        displayTasks(); // नई लिस्ट दिखाएं
+      }
+    }
+
+    // Delete a task
+    function deleteTask(index) {
+      const updatedTasks = [];
+      for (let i = 0; i < tasks.length; i++) {
+        if (i !== index) {
+          updatedTasks.push(tasks[i]); // बाकी टास्क कॉपी करें
+        }
+      }
+      tasks = updatedTasks; // Array अपडेट करें
+      displayTasks(); // नई लिस्ट दिखाएं
+    }
+
+    // Add Task Button Event
+    addTaskBtn.addEventListener('click', addTask);
+  </script>
+</body>
+</html>
